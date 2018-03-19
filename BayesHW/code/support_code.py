@@ -191,7 +191,7 @@ def plotSampleLines(mean, variance,
     if(dataPoints.size):
         plt.plot(dataPoints[:, 0], dataPoints[:, 1],
                  "co")
-
+        
 def plotPredictiveDistribution(getPredictiveParams,postMean, postVar):
     stepSize = 0.05
     x = np.arange(-1, 1, stepSize)
