@@ -35,11 +35,9 @@ class ValueNode(object):
 
     def forward(self):
         self.d_out = np.zeros(self.out.shape)
-        #print(str(self.node_name) + " Forward Output = " + str(self.out))
         return self.out
 
     def backward(self):
-        #print(str(self.node_name) + " Backward Output = " + str(self.d_out))
         pass
         #return self.d_out
 
@@ -65,7 +63,6 @@ class VectorScalarAffineNode(object):
 
     def forward(self):
         self.out = np.dot(self.x.out, self.w.out) + self.b.out
-        #print(str(self.node_name) + " Forward Output = " + str(self.out))
         self.d_out = np.zeros(self.out.shape)
         return self.out
 
@@ -76,9 +73,6 @@ class VectorScalarAffineNode(object):
         self.x.d_out += d_x
         self.w.d_out += d_w
         self.b.d_out += d_b
-        #print(str(self.node_name) + " Backward Output d_w = " + str(d_w))
-        #print(str(self.node_name) + " Backward Output self.w.d_out = " + str(self.w.d_out))
-        #print(str(self.node_name) + " Backward Output d_out = " + str(self.d_out))
         return self.d_out
 
     def get_predecessors(self):
@@ -103,11 +97,8 @@ class SquaredL2DistanceNode(object):
 
     def forward(self):
         self.a_minus_b = self.a.out - self.b.out
-        #print(str(self.a.node_name) + " Forward Output = " + str(self.a.out))
-        #print(str(self.b.node_name) + " Forward Output = " + str(self.b.out))
         self.out = np.sum(self.a_minus_b ** 2)
         self.d_out = np.zeros(self.out.shape)
-        #print("SquaredL2DistanceNode Forward Output = " + str(self.out))
         return self.out
 
     def backward(self):
@@ -136,19 +127,14 @@ class L2NormPenaltyNode(object):
         self.l2_reg = np.array(l2_reg)
         self.w = w
         
-        ## TODO
     def forward(self):
         self.out = self.l2_reg * np.dot(self.w.out, self.w.out)
         self.d_out = np.zeros(self.out.shape)
-        #print("w Forward Output = " + str(self.w.out))
-        #print("L2NormPenaltyNode Forward Output = " + str(self.out))
         return self.out
 
     def backward(self):
         d_w = self.d_out * 2 * self.l2_reg * self.w.out
         self.w.d_out += d_w
-        #print(str(self.node_name) + " Backward Output d_w = " + str(d_w))
-        #print(str(self.node_name) + " Backward Output d_out = " + str(self.d_out))
         return self.d_out
 
     def get_predecessors(self):
@@ -163,7 +149,7 @@ class SumNode(object):
         b: node for which b.out is a numpy array of the same shape as a
         node_name: node's name (a string)
         """
-        ## TODO
+
         self.node_name = node_name
         self.out = None
         self.d_out = None
@@ -173,17 +159,15 @@ class SumNode(object):
     def forward(self):
         self.out = np.sum([self.a.out,self.b.out], axis=0) 
         self.d_out = np.zeros(self.out.shape)
-        #print(str(self.node_name) + " Forward Output = " + str(self.out))
+
         return self.out
 
     def backward(self):
         d_a = self.d_out
         d_b = self.d_out
-        #print(str(self.node_name) + " Backward Output d_a = " + str(d_a))
-        #print(str(self.node_name) + " Backward Output d_b = " + str(d_b))
         self.a.d_out += d_a
         self.b.d_out += d_b
-        #print(str(self.node_name) + " Backward Output d_out = " + str(self.d_out))
+
         return self.d_out
 
     def get_predecessors(self):
@@ -198,7 +182,7 @@ class AffineNode(object):
         b: node for which b.out is a numpy array of shape (m) 
         (i.e. vector of length m)
     """
-    ## TODO
+
     def __init__(self, W, x, b, node_name):
         self.node_name = node_name
         self.out = None
@@ -208,45 +192,25 @@ class AffineNode(object):
         self.W = W
 
     def forward(self):
-        #print("shape x = " + str(self.x.out.shape))
-        #print("shape W = " + str(self.W.out.shape))
-        #print("shape b = " + str(self.b.out.shape))
         mult_wx = np.dot(self.W.out,self.x.out)
         self.out = np.sum([mult_wx,self.b.out.T], axis=0) 
-        #print("shape Wx + b = " + str(self.out.shape))
-        #print("shape out forward = " + str(self.out.shape))
-        
-        # one d_out conf
-        # self.d_out = np.zeros(self.out.shape)
-        # print("shape d_out forward = " + str(self.d_out.shape))
-        
-        # x.d_out and W.d_out conf
-        self.d_out_x = np.zeros(self.x.out.shape)
-        #print("shape d_out_x forward = " + str(self.d_out_x.shape))
-        self.d_out_W = np.zeros(self.W.out.shape)
-        #print("shape d_out_W forward = " + str(self.d_out_W.shape))
-        self.d_out_b = np.zeros(self.b.out.shape)
-        #print("shape d_out_W forward = " + str(self.d_out_W.shape))
 
-        #print(str(self.node_name) + " Forward Output = " + str(self.out))
+        self.d_out_x = np.zeros(self.x.out.shape)
+        self.d_out_W = np.zeros(self.W.out.shape)
+        self.d_out_b = np.zeros(self.b.out.shape)
+
         return self.out
 
     def backward(self):
-        #print("shape d_out_x backward = " + str(self.d_out_x.shape))
-        #print("shape d_out_W backward = " + str(self.d_out_W.shape))
-        #print("output d_out_x backward = " + str(self.d_out_x))
-        #print("output d_out_W backward = " + str(self.d_out_W))
         
         d_x = np.dot(self.d_out_x, self.W.out)
         d_W = np.dot(self.d_out_W, self.x.out)
         d_b = self.d_out_b
-        #print("d_x backward = " + str(d_x))
-        #print("d_W backward = " + str(d_W))
-        #print("d_b backward = " + str(d_b))
+
         self.x.d_out += d_x
         self.W.d_out += d_W
         self.b.d_out += d_b
-        #print(str(self.node_name) + " Backward Output d_out = " + str(self.d_out))
+
         return self.d_out
 
     def get_predecessors(self):
@@ -258,7 +222,7 @@ class TanhNode(object):
         Parameters:
         a: node for which a.out is a numpy array
     """
-    ## TODO
+
     def __init__(self, a, node_name):
         self.node_name = node_name
         self.out = None
@@ -268,16 +232,13 @@ class TanhNode(object):
     def forward(self):
         self.out = np.tanh(self.a.out) 
         self.d_out = np.zeros(self.out.shape)
-        #print(str(self.node_name) + " Forward Output = " + str(self.out))
+
         return self.out
 
     def backward(self):
-        # self.out has tanh already calculated
         d_a = self.d_out * (1.0 - self.out**2)  
-        #print(str(self.node_name) + " Backward Output d_a = " + str(d_a))
-        #print(str(self.node_name) + " Backward Output d_b = " + str(d_b))
         self.a.d_out += d_a
-        #print(str(self.node_name) + " Backward Output d_out = " + str(self.d_out))
+
         return self.d_out
 
     def get_predecessors(self):

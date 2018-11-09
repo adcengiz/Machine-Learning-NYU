@@ -20,7 +20,6 @@ class RidgeRegression(BaseEstimator, RegressorMixin):
                                                        w=self.w, 
                                                        b=self.b,
                                                        node_name="prediction")
-        # TODO
         
         # Square Loss
         self.square_loss = nodes.SquaredL2DistanceNode(a = self.prediction,
